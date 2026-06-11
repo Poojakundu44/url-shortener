@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.14</version>
+		<relativePath/>
+	</parent>
+
+	<groupId>com.urlshortener</groupId>
+	<artifactId>url-shortener</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>url-shortener</name>
+	<description>Production-grade URL Shortener Service</description>
+
+	<properties>
+		<java.version>17</java.version>
+		<!--
+          Why 17 and not 21?
+          Java 17 is the current LTS baseline for most enterprise orgs.
+          Java 21 has virtual threads (Project Loom) — worth mentioning in
+          interviews as a scalability improvement. We'll revisit this in Phase 5.
+        -->
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- === WEB TIER === -->
+		<!--
+          spring-boot-starter-web brings: Tomcat, Spring MVC, Jackson.
+          Scalability note: Tomcat uses thread-per-request model.
+          For high concurrency, consider spring-boot-starter-webflux (reactive)
+          or virtual threads (Java 21). Mention this in interviews.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- === DATA TIER === -->
+		<!--
+          Spring Data JPA wraps Hibernate. Gives you repository pattern,
+          query derivation, and pagination out of the box.
+          Alternative: jOOQ (type-safe SQL) — better for complex queries,
+          no N+1 surprises. Worth mentioning in interviews.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<!-- H2 for Phase 1. 'runtime' scope = only active at runtime, not compile. -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- Add inside <dependencies> -->
+
+		<!-- Spring Data Redis — Lettuce client (non-blocking, connection pooling) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
+		<!--
+          Spring Cache abstraction — @Cacheable, @CacheEvict, @CachePut.
+          Lets you switch cache implementations (Redis, Caffeine, EhCache)
+          without changing business code.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+		<!-- === VALIDATION === -->
+		<!--
+          Bean Validation (JSR-380). Lets you annotate DTOs with
+          @NotBlank, @URL, @Size etc. and validate at controller entry.
+          Interview: always validate at the boundary, not deep in service layer.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+		<!-- === OBSERVABILITY === -->
+		<!--
+          Actuator exposes /actuator/health, /actuator/metrics, /actuator/info.
+          In production this plugs into Prometheus + Grafana.
+          Interview: "How do you monitor a microservice?" — always mention this.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- === DEVELOPER PRODUCTIVITY === -->
+		<!-- Lombok: eliminates boilerplate. @Data, @Builder, @Slf4j etc. -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- === TESTING === -->
+		<!--
+          spring-boot-starter-test bundles: JUnit 5, Mockito, AssertJ,
+          Hamcrest, MockMvc, @SpringBootTest.
+          This is everything you need for unit + integration tests.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!--
+              The Spring Boot Maven plugin does TWO important things:
+              1. Creates a fat/uber JAR (all deps bundled) for deployment.
+              2. Enables `mvn spring-boot:run` for local dev.
+              Interview: "How do you package a Spring Boot app?" → fat JAR.
+            -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

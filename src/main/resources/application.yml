@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: url-shortener
+
+  datasource:
+    url: jdbc:h2:mem:urlshortenerdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    open-in-view: false    # add this line
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # Redis Configuration (Phase 3)
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+
+  # Spring Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+app:
+  base-url: http://localhost:8080
+  short-code-length: 7
+  default-expiry-days: 365
+
+  cache:
+    url-ttl-seconds: 3600
+    url-cache-name: urls
+
+logging:
+  level:
+    root: WARN                        # default for everything
+    com.urlshortener: DEBUG           # your code — verbose in dev
+    org.springframework.web: INFO     # Spring MVC request logs
+    org.hibernate.SQL: DEBUG          # see generated SQL
+    org.hibernate.type.descriptor.sql: TRACE  # see SQL parameter values
